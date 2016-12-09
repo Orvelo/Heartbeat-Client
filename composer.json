@@ -1,7 +1,6 @@
 {
   "name": "orvelo/heartbeat-client",
   "description": "Orvelo Heartbeat client - get alerts when your scripts don't complete a healthcheck check-in",
-  "version": "1.0.0",
   "license": "proprietary",
   "authors": [
     {

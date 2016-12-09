@@ -124,11 +124,9 @@ class Heartbeat
     /**
      * On destruct we send the actual request off
      */
-    protected function __destruct()
+    public function __destruct()
     {
-        if ( ! $this->sent) {
-            $this->dispatch();
-        }
+        $this->dispatch();
     }
 
     /**
@@ -216,12 +214,6 @@ class Heartbeat
             return;
         }
     }
-
-    /**
-     * Whether this has been sent or not
-     * @var boolean
-     */
-    protected $sent = false;
 
     /**
      * Your client token

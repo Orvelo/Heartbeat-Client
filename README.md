@@ -22,7 +22,7 @@ Basic Usage
 Include the Heartbeat Client in your **composer.json**
 
 ```
-"orvelo/heartbeat-client" : "v1.*"
+"orvelo/heartbeat-client" : "^1.0"
 ```
 
 Assuming you have required vendor/autoload.php then this is the minimum required steps to start the server listening:

@@ -15,6 +15,24 @@ class Heartbeat
     const HEARTBEAT_SERVER = 'http://heartbeat.orvelo.com/beat';
 
     /**
+     * State of tasks for this environment
+     * @var int
+     */
+    const STATE_NORMAL = 0;
+
+    /**
+     * State of tasks for this environment
+     * @var int
+     */
+    const STATE_PAUSE = 1;
+
+    /**
+     * State of tasks for this environment
+     * @var int
+     */
+    const STATE_RESUME = 2;
+
+    /**
      * Entrypoint to kick things off
      * @param  string $task_name name of the task that we're dealing with
      * @return self
@@ -114,6 +132,24 @@ class Heartbeat
     }
 
     /**
+     * Pause all jobs running on this environment
+     * @return Heartbeat
+     */
+    public function pause()
+    {
+        $this->state = self::STATE_PAUSE;
+    }
+
+    /**
+     * Resume all jobs running on this environment
+     * @return Heartbeat
+     */
+    public function resume()
+    {
+        $this->state = self::STATE_RESUME;
+    }
+
+    /**
      * Protected construct as this should only be invoked by ::task()
      */
     protected function __construct($task_name)
@@ -143,6 +179,7 @@ class Heartbeat
             'email' => $this->email,
             'every' => $this->every,
             'slop'  => $this->slop,
+            'state' => $this->state,
         );
 
         // add in cancel / oh no as necessary
@@ -160,7 +197,6 @@ class Heartbeat
         );
 
         // curl would be nice, but no biggie if it's not there
-        // contexts are a thing and help with post!
         if (function_exists('curl_init')) {
             $curl = curl_init();
             curl_setopt_array(
@@ -177,6 +213,7 @@ class Heartbeat
             $raw_response = curl_exec($curl);
             curl_close($curl);
         } else {
+            // contexts are a thing and help with post!
             $raw_response = @file_get_contents(
                 self::HEARTBEAT_SERVER,
                 false,
@@ -250,6 +287,12 @@ class Heartbeat
      * @var boolean
      */
     protected $ohDear = false;
+
+    /**
+     * State of the task - pause / resume / normal
+     * @var string
+     */
+    protected $state = self::STATE_NORMAL;
 
     /**
      * The source of the alert

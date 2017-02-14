@@ -14,7 +14,7 @@
 Heartbeat Client
 ================
 
-The Heartbeat server gives you peace of mind that your cronhobs are running by listening out for 'beats' provided once your jobs complete successfully.  Beats are communicated to the server via this client (or write your own if you prefer!)
+The Heartbeat server gives you peace of mind that your cronjobs are running by listening out for 'beats' provided once your jobs complete successfully.  Beats are communicated to the server via this client (or write your own if you prefer!)
 
 Basic Usage
 -----------
@@ -30,7 +30,7 @@ Assuming you have required vendor/autoload.php then this is the minimum required
 ```
 \Orvelo\Heartbeat::task('Super-important task')
     ->token('TOKEN_GOES_HERE')
-    ->source('live-server')
+    ->source('live-cluster')
     ->every('15m')
     ->slop('2m')
     ->email('person@example.com');
@@ -51,11 +51,11 @@ The unique identifiers for tasks are the task name and the source.  You can have
 
 You can amend the task at any time by adjusting any of the functions that are not **task()**, **token()** and **source()**.  The next call to the server will act as a heartbeat received and make the changes.
 
-Available functions
+Everyday functions
 -------------------
 
-**task(string)**
-Set the task name. This will be used when identifying the task and in the email notifications that get sent
+**static task(string)**
+Acts as the constructor and sets the task name. This will be used when identifying the task and in the email notifications that get sent
 
 **token(string)**
 Set your access token. Without a valid token the server will not respond
@@ -68,13 +68,13 @@ Set your expected time between updates.  Some examples:
  - ..etc
 
 **slop(string)**
-Allow the task to not be so strict with timings - gives an extra <period> of time between warnings.  Uses the same format as **every()**
+Allow the task to not be so strict with timings and gives an extra period of time between warnings.  Uses the same format as **every()**  Useful if your scripts completion time fluctuates.
 
 **email(string|string[])**
-Set the email addresses that we're sending to
+Set the email address(es) that we're sending to
 
 **source(string)**
-Set the source
+Set the source. Either target a specific server with gethostname() or define it as coming from your cron cluster.
 
 Cancelling a Heartbeat
 ----------------------
@@ -85,7 +85,7 @@ Send the task name and source along with a call to **cancel()** as so:
 // cancel an existing task
 \Orvelo\Heartbeat::task('Super-important task')
     ->token('TOKEN_GOES_HERE')
-    ->source('live-server')
+    ->source('live-cluster')
     ->cancel();
 ```
 
@@ -97,7 +97,31 @@ You can also use the Heartbeat server as a notification system for some of the m
 ```
 \Orvelo\Heartbeat::task('This should never happen!')
     ->token('TOKEN_GOES_HERE')
-    ->source('live-server')
+    ->source('live-cluster')
     ->email('person@example.com')
     ->ohDear();
+```
+
+Pausing All Tasks
+-----------------
+
+If you have tasks that have regular intervals that would be interrupted by a deployment, migration or planned downtime for maintenance then you can pause all tasks from a defined source.  This will stop the heartbeat server from checking for beats:
+
+```
+\Orvelo\Heartbeat::task('Pause')
+    ->token('TOKEN_GOES_HERE')
+    ->source('live-cluster')
+    ->pause();
+```
+
+Resuming All Tasks
+------------------
+
+Once you have finished performing maintenance on your application you can then tell the Heartbeat Server to resume operations.  All tasks that originate from this source will have their next run time set to now plus their pre-configured interval.
+
+```
+\Orvelo\Heartbeat::task('Resume')
+    ->token('TOKEN_GOES_HERE')
+    ->source('live-cluster')
+    ->resume();
 ```

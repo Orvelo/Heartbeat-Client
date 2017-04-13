@@ -218,9 +218,11 @@ class Heartbeat
                 self::HEARTBEAT_SERVER,
                 false,
                 stream_context_create(array(
-                    'method'  => 'POST',
-                    'header'  => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => http_build_query($params)
+                    'http' => array(
+                        'method'  => 'POST',
+                        'header'  => 'Content-type: application/x-www-form-urlencoded',
+                        'content' => http_build_query($params)
+                    ),
                 ))
             );
         }
